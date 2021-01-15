@@ -1,5 +1,7 @@
 ﻿using PhoneStation.Port;
 using PhoneStation.StationLogs;
+using PhoneStation.Terminal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,8 +42,13 @@ namespace PhoneStation.Station
 
         public void SendRequestToCall(string callerNumber, string receiverNumber)
         {
-            var callerPort = AvailablePorts.Where(p => p.Terminal.PhoneNumber.Number == callerNumber).FirstOrDefault();
-            var receiverPort = AvailablePorts.Where(p => p.Terminal.PhoneNumber.Number == receiverNumber).FirstOrDefault();
+            var callerPort = AvailablePorts
+                .Where(p => p.Terminal.PhoneNumber.Number == callerNumber)
+                .FirstOrDefault();
+            var receiverPort = AvailablePorts
+                .Where(p => p.PortState != PortState.UnPlugged) //без этой строки выдает NullReferenceEx, не знаю, как избавиться это этой проблемы как-то получше
+                .Where(p => p.Terminal.PhoneNumber.Number == receiverNumber)
+                .FirstOrDefault();
             if (receiverPort != null)
             {
                 if (receiverPort.PortState == PortState.Free)
@@ -64,7 +71,6 @@ namespace PhoneStation.Station
         {
             caller.ConnectedCallPort = receiver;
             receiver.ConnectedCallPort = caller;
-            receiver.IsBusy = true;
         }
     }
 }

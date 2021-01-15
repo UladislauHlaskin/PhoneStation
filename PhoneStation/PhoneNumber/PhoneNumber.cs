@@ -23,5 +23,10 @@
         {
             Money += money;
         }
+
+        public override string ToString()
+        {
+            return $"{UserName}, {Number}";
+        }
     }
 }

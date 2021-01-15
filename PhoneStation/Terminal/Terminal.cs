@@ -1,81 +1,68 @@
 ﻿using PhoneStation.PhoneNumber;
 using PhoneStation.Port;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PhoneStation.Terminal
 {
     public class Terminal : ITerminal
     {
-        public string Name { get; }
-
-        public IPort Port { get; private set; }
-
+        public IPort Port { get; set; }
         public IPhoneNumber PhoneNumber { get; set; }
 
-        public bool IsReceivingCall { get; private set; }
+        public event TerminalEventHandler TryingToCall;
+        public event TerminalEventHandler ReceivingCall;
+        public event TerminalEventHandler Answering;
+        public event TerminalEventHandler Dropping;
 
-        public Terminal(string name)
+        public Terminal(IPhoneNumber phoneNumber)
         {
-            Name = name;
+            PhoneNumber = phoneNumber;
         }
 
-        public void SendRequestToAnswer(string callerNumber)
+        public void ReceiveCallNotification(string callerNumber)
         {
-            Console.WriteLine($"{callerNumber} is calling!");
-            IsReceivingCall = true;
+            ReceivingCall?.Invoke(this, new TerminalEventArgs(callerNumber));
         }
 
         public void Answer()
         {
-            if (IsReceivingCall)
-            {
-                //TODO Log append
-            }
+            Answering?.Invoke(this, null);
         }
 
         public void Call(string receiverNumber)
         {
+            TryingToCall?.Invoke(this, new TerminalEventArgs(receiverNumber));
+
+            if (Port == null)
+            {
+                throw new NullReferenceException($"{PhoneNumber.UserName} is unable to make a call. The phone isn't connected to any port.");
+            }
+            if (Port.PortState == PortState.Busy)
+            {
+                throw new InvalidOperationException($"{PhoneNumber.UserName} cannot call, his port is taken.");
+            }
             if (receiverNumber == PhoneNumber.Number)
             {
-                throw new InvalidOperationException("You cannot call yourself.");
+                throw new InvalidOperationException($"{PhoneNumber.UserName} cannot call himself (herself).");
             }
             else if (Port != null)
             {
-                Port.IsBusy = true;
                 Port.SendRequestToCall(PhoneNumber.Number, receiverNumber);
-                // TODO Log append
             }
             else
             {
-                throw new InvalidOperationException("Unable to call, the terminal isn't connected to any port.");
+                throw new InvalidOperationException($"{PhoneNumber.UserName} is unable to call, the terminal isn't connected to any port.");
             }    
         }
 
         public void Drop()
         {
-            if (IsReceivingCall)
-            {
-                //TODO Log append
-                Port.IsBusy = false;
-                IsReceivingCall = false;
-            }
+            Dropping?.Invoke(this, null);
         }
 
         public void Plug(IPort port)
         {
-            if (port.PortState == PortState.UnPlagged)
-            {
-                Port = port;
-                Port.Terminal = this;
-            }
-            else
-            {
-                throw new AccessViolationException("The port is taken, cannot plug.");
-            }
+            port.PlugTerminal(this);
         }
 
         public void Unplug()
@@ -84,10 +71,14 @@ namespace PhoneStation.Terminal
             Port = null;
         }
 
-        public void SendErrorMessage(string message)
+        public void UnableToCallMessage(string message)
         {
             Console.WriteLine(message);
-            Drop();
+        }
+
+        public override string ToString()
+        {
+            return $"{PhoneNumber}, {Port.PortState.ToString()}";
         }
     }
 }

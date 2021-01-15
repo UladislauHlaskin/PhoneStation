@@ -4,16 +4,22 @@ using System;
 
 namespace PhoneStation.Terminal
 {
+    public delegate void TerminalEventHandler(object sender, TerminalEventArgs e);
     public interface ITerminal
     {
-        IPort Port { get; }
-        IPhoneNumber PhoneNumber { get; set; }
-        void Answer();
+        IPort Port { get; set; }
+        IPhoneNumber PhoneNumber { get; }
+        event TerminalEventHandler TryingToCall;
+        event TerminalEventHandler ReceivingCall;
+        event TerminalEventHandler Answering;
+        event TerminalEventHandler Dropping;
+
         void Call(string numberToCall);
+        void ReceiveCallNotification(string callerNumber);
+        void Answer();
         void Drop();
         void Plug(IPort port);
         void Unplug();
-        void SendErrorMessage(string message);
-        void SendRequestToAnswer(string callerNumber);
+        void UnableToCallMessage(string message);
     }
 }

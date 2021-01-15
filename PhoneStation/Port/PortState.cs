@@ -4,6 +4,6 @@
     {
         Free, 
         Busy, 
-        UnPlagged
+        UnPlugged
     }
 }

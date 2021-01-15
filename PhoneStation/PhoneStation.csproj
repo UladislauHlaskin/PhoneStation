@@ -53,8 +53,10 @@
     <Compile Include="StationLogs\LogAction.cs" />
     <Compile Include="Station\IStation.cs" />
     <Compile Include="Station\Station.cs" />
+    <Compile Include="Terminal\ConsoleTerminalHandler.cs" />
     <Compile Include="Terminal\ITerminal.cs" />
     <Compile Include="Terminal\Terminal.cs" />
+    <Compile Include="Terminal\TerminalEventArgs.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

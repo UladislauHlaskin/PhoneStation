@@ -16,9 +16,9 @@ namespace PhoneStation.Port
             {
                 if(Terminal == null)
                 {
-                    return PortState.UnPlagged;
+                    return PortState.UnPlugged;
                 }
-                else if (IsBusy)
+                else if (ConnectedCallPort != null)
                 {
                     return PortState.Busy;
                 }
@@ -30,15 +30,17 @@ namespace PhoneStation.Port
         }
 
         public ITerminal Terminal { get; set; }
-
         public IStation Station { get; }
-        public bool IsBusy { get; set; }
         public IPort ConnectedCallPort { get; set; }
-
         public Port(IStation station)
         {
             Station = station;
-            station.AvailablePorts.Add(this);
+        }
+
+        public void DropConnection()
+        {
+            ConnectedCallPort.ConnectedCallPort = null;
+            ConnectedCallPort = null;
         }
 
         public void SendRequestToCall(string callerNumber, string receiverNumber)
@@ -48,20 +50,32 @@ namespace PhoneStation.Port
 
         public void SendErrorMessage(string message)
         {
-            Terminal.SendErrorMessage(message);
+            Terminal.UnableToCallMessage(message);
+        }
+
+        public void PlugTerminal(ITerminal terminal)
+        {
+            if (PortState == PortState.UnPlugged)
+            {
+                Terminal = terminal;
+                Terminal.Port = this;
+            }
+            else
+            {
+                throw new InvalidOperationException("The port is taken, cannot plug.");
+            }
         }
 
         public void UnplugTerminal()
         {
             Terminal = null;
-            IsBusy = false;
             ConnectedCallPort.ConnectedCallPort = null;
             ConnectedCallPort = null;
         }
 
         public void SendRequestToAnswer(string callerNumber)
         {
-            Terminal.SendRequestToAnswer(callerNumber);
+            Terminal.ReceiveCallNotification(callerNumber);
         }
     }
 }

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PhoneStation.Station;
 using PhoneStation.PhoneNumber;
 using PhoneStation.Terminal;
+using System.Text;
 /*
 Разработать набор классов для моделирования работы автоматический телефонной станции (АТС) и простейшей биллинговой системы. 
 
@@ -22,9 +21,8 @@ using PhoneStation.Terminal;
 
 
 TODO
-* events
 * log
-* exception handling
+* money
 */
 namespace Demo
 {
@@ -32,46 +30,53 @@ namespace Demo
     {
         static void Main(string[] args)
         {
+            Console.OutputEncoding = Encoding.UTF8;
+
             int portCapacity = 10;
             double defaultTariff = 0.1;
             IStation station = new Station(portCapacity, defaultTariff);
-            var phoneNumbers = GetPhoneNumbers();
             var terminals = GetTerminals();
-            ConnectTerminalsAndPhoneNumbers(terminals, phoneNumbers);
             PlugPorts(station, terminals);
-        }
 
-        static IList<IPhoneNumber> GetPhoneNumbers()
-        {
-            List<IPhoneNumber> phoneNumbers = new List<IPhoneNumber>();
-            phoneNumbers.Add(new PhoneNumber("123-00-00", "John", 10));
-            phoneNumbers.Add(new PhoneNumber("123-00-01", "Jane", 15));
-            phoneNumbers.Add(new PhoneNumber("123-00-03", "Anonymous", 10));
-            phoneNumbers.Add(new PhoneNumber("321-00-01", "Michael", 10));
-            phoneNumbers.Add(new PhoneNumber("431-01-01", "Rachel", 20));
-            return phoneNumbers;
+            var johnsPhone = GetTerminalByName(terminals, "John");
+            var janesPhone = GetTerminalByName(terminals, "Jane");
+            var anonymousPhone = GetTerminalByName(terminals, "Anonymous");
+            var michaelsPhone = GetTerminalByName(terminals, "Michael");
+            var rachelsPhone = GetTerminalByName(terminals, "Rachel");
+            var jacksPhone = new Terminal(new PhoneNumber("001-01-01", "Jack"));
+
+            Call(michaelsPhone, johnsPhone);
+            johnsPhone.Answer();
+            michaelsPhone.Drop();
+            Call(anonymousPhone, michaelsPhone);
+            Call(anonymousPhone, rachelsPhone);
+            michaelsPhone.Drop();
+            Call(janesPhone, rachelsPhone);
+            rachelsPhone.Answer();
+            janesPhone.Drop();
+            Call(jacksPhone, johnsPhone);
+            Call(johnsPhone, jacksPhone);
         }
 
         static IList<ITerminal> GetTerminals()
         {
             List<ITerminal> terminals = new List<ITerminal>();
-            terminals.Add(new Terminal("John's Nokia"));
-            terminals.Add(new Terminal("Jane's Motorola"));
-            terminals.Add(new Terminal("Anonymous' IPhone"));
-            terminals.Add(new Terminal("Michael's Samsung"));
-            terminals.Add(new Terminal("Rachel's Sony"));
+            terminals.Add(GetTerminal(new PhoneNumber("123-00-00", "John", 10), ConsoleTerminalHandler.OnTryToCallBeep));
+            terminals.Add(GetTerminal(new PhoneNumber("123-00-01", "Jane", 15), ConsoleTerminalHandler.OnTryToCallCustomSong));
+            terminals.Add(GetTerminal(new PhoneNumber("123-00-03", "Anonymous", 10), ConsoleTerminalHandler.OnTryToCallBeep));
+            terminals.Add(GetTerminal(new PhoneNumber("321-00-01", "Michael", 10), ConsoleTerminalHandler.OnTryToCallBeep));
+            terminals.Add(GetTerminal(new PhoneNumber("431-01-01", "Rachel", 20), ConsoleTerminalHandler.OnTryToCallCustomSong));
             return terminals;
         }
 
-        static void ConnectTerminalsAndPhoneNumbers(IList<ITerminal> terminals, IList<IPhoneNumber> phoneNumbers)
+        static ITerminal GetTerminal(IPhoneNumber phoneNumber, TerminalEventHandler terminalEventHandler)
         {
-            for(int i = 0; i < terminals.Count; i++)
-            {
-                if (i < phoneNumbers.Count)
-                {
-                    terminals[i].PhoneNumber = phoneNumbers[i];
-                }
-            }
+            var terminal = new Terminal(new PhoneNumber(phoneNumber.Number, phoneNumber.UserName, phoneNumber.Money));
+            terminal.TryingToCall += terminalEventHandler;
+            terminal.ReceivingCall += ConsoleTerminalHandler.OnReceiveCallNotification;
+            terminal.Answering += ConsoleTerminalHandler.OnAnswer;
+            terminal.Dropping += ConsoleTerminalHandler.OnDrop;
+            return terminal;
         }
 
         static void PlugPorts(IStation station, IList<ITerminal> terminals)
@@ -80,8 +85,35 @@ namespace Demo
             {
                 if (i < station.AvailablePorts.Count)
                 {
-                    terminals[i].Plug(station.AvailablePorts[i]);
+                    try
+                    {
+                        //station.AvailablePorts[i].PlugTerminal(terminals[i]);
+                        // Абонент может самостоятельно отключать/ подключать телефон к порту станции (от имени терминала я полагаю?)
+                        terminals[i].Plug(station.AvailablePorts[i]);
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
+            }
+        }
+
+        static ITerminal GetTerminalByName(IList<ITerminal> terminals, string name)
+        {
+            return terminals.FirstOrDefault(t => t.PhoneNumber.UserName == name);
+        }
+
+        static void Call(ITerminal sender, ITerminal receiver)
+        {
+            try
+            {
+                sender.Call(receiver.PhoneNumber.Number);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                //Console.WriteLine(ex.ToString());
             }
         }
 
