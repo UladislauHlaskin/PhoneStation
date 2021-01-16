@@ -4,7 +4,7 @@ namespace PhoneStation.Terminal
 {
     public class TerminalEventArgs : EventArgs
     {
-        public string SomeonesNumber { get; set; }
+        public string SomeonesNumber { get; }
 
         public TerminalEventArgs() { }
 

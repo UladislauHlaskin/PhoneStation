@@ -32,9 +32,7 @@ namespace PhoneStation.Port
         public ITerminal Terminal { get; set; }
         public IStation Station { get; }
         public IPort ConnectedCallPort { get; set; }
-        //public bool IsCaller { get; set; }
-        //private DateTime _connectionStartTime;
-        //private TimeSpan _connectionEndTime;
+
         public Port(IStation station)
         {
             Station = station;

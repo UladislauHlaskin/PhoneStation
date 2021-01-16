@@ -1,6 +1,5 @@
 ﻿using PhoneStation.Port;
 using PhoneStation.StationLogs;
-using PhoneStation.Terminal;
 using PhoneStation.PhoneNumber;
 using System;
 using System.Collections.Generic;
