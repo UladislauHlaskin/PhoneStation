@@ -13,6 +13,9 @@ namespace PhoneStation.Terminal
         public event TerminalEventHandler ReceivingCall;
         public event TerminalEventHandler Answering;
         public event TerminalEventHandler Dropping;
+        public event TerminalEventHandler UnableTocall;
+
+        private string _someonesNumber;
 
         public Terminal(IPhoneNumber phoneNumber)
         {
@@ -21,12 +24,14 @@ namespace PhoneStation.Terminal
 
         public void ReceiveCallNotification(string callerNumber)
         {
+            _someonesNumber = callerNumber;
             ReceivingCall?.Invoke(this, new TerminalEventArgs(callerNumber));
         }
 
         public void Answer()
         {
-            Answering?.Invoke(this, null);
+            Answering?.Invoke(this, new TerminalEventArgs(_someonesNumber));
+            Port.Station.StartOnGoingCall(_someonesNumber, PhoneNumber.Number);
         }
 
         public void Call(string receiverNumber)
@@ -52,12 +57,22 @@ namespace PhoneStation.Terminal
             else
             {
                 throw new InvalidOperationException($"{PhoneNumber.UserName} is unable to call, the terminal isn't connected to any port.");
-            }    
+            }
+            _someonesNumber = receiverNumber;
         }
 
         public void Drop()
         {
-            Dropping?.Invoke(this, null);
+            Dropping?.Invoke(this, new TerminalEventArgs(_someonesNumber));
+            _someonesNumber = null;
+            Port.Station.EndOngoingCall(PhoneNumber.Number, 2);
+        }
+
+        public void Drop(int callDurationMinutes)
+        {
+            Dropping?.Invoke(this, new TerminalEventArgs(_someonesNumber));
+            _someonesNumber = null;
+            Port.Station.EndOngoingCall(PhoneNumber.Number, callDurationMinutes);
         }
 
         public void Plug(IPort port)
@@ -69,11 +84,12 @@ namespace PhoneStation.Terminal
         {
             Port.UnplugTerminal();
             Port = null;
+            _someonesNumber = null;
         }
 
         public void UnableToCallMessage(string message)
         {
-            Console.WriteLine(message);
+            UnableTocall?.Invoke(this, new TerminalEventArgs(message));
         }
 
         public override string ToString()

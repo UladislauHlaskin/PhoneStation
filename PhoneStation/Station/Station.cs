@@ -1,6 +1,7 @@
 ﻿using PhoneStation.Port;
 using PhoneStation.StationLogs;
 using PhoneStation.Terminal;
+using PhoneStation.PhoneNumber;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,12 @@ namespace PhoneStation.Station
     public class Station : IStation
     {
         public IList<IPort> AvailablePorts { get; private set; }
-
         public Log Log { get; }
-
         public double Tariff { get; private set; }
 
         private int _defaultPortCapacity = 10;
         private double _defaultTariff = 1;
+        private IList<OngoingCall> _ongoingCalls;
 
         public Station()
         {
@@ -26,6 +26,7 @@ namespace PhoneStation.Station
                 AvailablePorts.Add(new Port.Port(this));
             }
             Log = new Log();
+            _ongoingCalls = new List<OngoingCall>();
             Tariff = _defaultTariff;
         }
 
@@ -36,6 +37,7 @@ namespace PhoneStation.Station
             {
                 AvailablePorts.Add(new Port.Port(this));
             }
+            _ongoingCalls = new List<OngoingCall>();
             Log = new Log();
             Tariff = tariff;
         }
@@ -71,6 +73,31 @@ namespace PhoneStation.Station
         {
             caller.ConnectedCallPort = receiver;
             receiver.ConnectedCallPort = caller;
+        }
+
+        public void StartOnGoingCall(string caller, string receiver)
+        {
+            _ongoingCalls.Add(new OngoingCall(caller, receiver, DateTime.Now));
+        }
+
+        public void EndOngoingCall(string droppingNumber, int callDurationMinutes)
+        {
+            var call = _ongoingCalls.FirstOrDefault(c => c.Caller == droppingNumber || c.Receiver == droppingNumber);
+            if (call != null)
+            {
+                var caller = AvailablePorts.Select(p => p.Terminal).Select(t => t.PhoneNumber).FirstOrDefault(n => n.Number == call.Caller);
+                var receiver = AvailablePorts.Select(p => p.Terminal).Select(t => t.PhoneNumber).FirstOrDefault(n => n.Number == call.Receiver);
+                var callEnd = call.Start + new TimeSpan(0, callDurationMinutes, 0);
+                var moneySpent = callDurationMinutes * Tariff;
+                Log.Actions.Add(new LogAction(caller, receiver, call.Start, callEnd, moneySpent));
+                SpendMoney(caller, moneySpent);
+                _ongoingCalls.Remove(call);
+            }
+        }
+
+        void SpendMoney(IPhoneNumber caller, double moneySpent)
+        {
+            caller.ChangeBalance(-moneySpent);
         }
     }
 }

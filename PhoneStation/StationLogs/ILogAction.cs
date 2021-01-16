@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PhoneStation.PhoneNumber;
+using System;
 
 namespace PhoneStation.StationLogs
 {
-    interface ILogAction
+    public interface ILogAction
     {
-
+        IPhoneNumber Caller { get; }
+        IPhoneNumber Receiver { get; }
+        DateTime Start { get; }
+        DateTime End { get; }
+        TimeSpan Duration { get; }
+        double MoneySpent { get; }
     }
 }

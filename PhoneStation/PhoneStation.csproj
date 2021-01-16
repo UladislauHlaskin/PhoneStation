@@ -47,11 +47,11 @@
     <Compile Include="Port\Port.cs" />
     <Compile Include="Port\PortState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="StationLogs\ActionType.cs" />
     <Compile Include="StationLogs\ILogAction.cs" />
     <Compile Include="StationLogs\Log.cs" />
     <Compile Include="StationLogs\LogAction.cs" />
     <Compile Include="Station\IStation.cs" />
+    <Compile Include="Station\OngoingCall.cs" />
     <Compile Include="Station\Station.cs" />
     <Compile Include="Terminal\ConsoleTerminalHandler.cs" />
     <Compile Include="Terminal\ITerminal.cs" />

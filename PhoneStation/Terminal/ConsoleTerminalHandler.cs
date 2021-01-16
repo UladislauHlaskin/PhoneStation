@@ -70,5 +70,15 @@ namespace PhoneStation.Terminal
             }
         }
 
+        public static void OnUnableToCall(object sender, TerminalEventArgs e)
+        {
+            var terminal = sender as ITerminal;
+            if (terminal == null)
+            {
+                return;
+            }
+            Console.WriteLine($"{e.SomeonesNumber}");
+        }
+
     }
 }

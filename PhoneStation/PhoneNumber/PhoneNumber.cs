@@ -1,11 +1,12 @@
-﻿namespace PhoneStation.PhoneNumber
+﻿using System;
+using System.Globalization;
+
+namespace PhoneStation.PhoneNumber
 {
     public class PhoneNumber : IPhoneNumber
     {
         public string Number { get; private set; }
-
         public string UserName { get; private set; }
-
         public double Money { get; private set; }
 
         public PhoneNumber(string number, string userName)
@@ -26,7 +27,7 @@
 
         public override string ToString()
         {
-            return $"{UserName}, {Number}";
+            return $"{UserName}, {Number}, ${Math.Round(Money, 2).ToString(CultureInfo.InvariantCulture)}";
         }
     }
 }

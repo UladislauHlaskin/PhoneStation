@@ -13,11 +13,13 @@ namespace PhoneStation.Terminal
         event TerminalEventHandler ReceivingCall;
         event TerminalEventHandler Answering;
         event TerminalEventHandler Dropping;
+        event TerminalEventHandler UnableTocall;
 
         void Call(string numberToCall);
         void ReceiveCallNotification(string callerNumber);
         void Answer();
         void Drop();
+        void Drop(int callDurationMinutes);
         void Plug(IPort port);
         void Unplug();
         void UnableToCallMessage(string message);

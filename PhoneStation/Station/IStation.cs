@@ -11,6 +11,7 @@ namespace PhoneStation.Station
         Log Log { get; }
         double Tariff { get; }
         void SendRequestToCall(string callerNumber, string receiverNumber);
-        //void ConnectPorts(IPort caller, IPort receiver);  // с этим какая-то проблема, не могу разобраться почему
+        void StartOnGoingCall(string caller, string receiver);
+        void EndOngoingCall(string droppingNumber, int callDurationMinutes);
     }
 }
