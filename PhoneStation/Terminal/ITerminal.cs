@@ -8,7 +8,7 @@ namespace PhoneStation.Terminal
     public interface ITerminal
     {
         IPort Port { get; set; }
-        IPhoneNumber PhoneNumber { get; }
+        IStationUser PhoneNumber { get; }
         event TerminalEventHandler TryingToCall;
         event TerminalEventHandler ReceivingCall;
         event TerminalEventHandler Answering;

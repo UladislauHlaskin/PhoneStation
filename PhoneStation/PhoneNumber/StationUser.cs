@@ -3,24 +3,24 @@ using System.Globalization;
 
 namespace PhoneStation.PhoneNumber
 {
-    public class PhoneNumber : IPhoneNumber
+    public class StationUser : IStationUser
     {
         public string Number { get; private set; }
         public string UserName { get; private set; }
-        public double Money { get; private set; }
+        public decimal Money { get; private set; }
 
-        public PhoneNumber(string number, string userName)
+        public StationUser(string number, string userName)
         {
             Number = number;
             UserName = userName;
         }
 
-        public PhoneNumber(string number, string userName, double money) : this(number, userName)
+        public StationUser(string number, string userName, decimal money) : this(number, userName)
         {
             Money = money;
         }
 
-        public void ChangeBalance(double money)
+        public void ChangeBalance(decimal money)
         {
             Money += money;
         }

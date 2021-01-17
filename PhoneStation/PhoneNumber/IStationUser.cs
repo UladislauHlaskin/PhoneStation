@@ -1,10 +1,10 @@
 ﻿namespace PhoneStation.PhoneNumber
 {
-    public interface IPhoneNumber
+    public interface IStationUser
     {
         string Number { get; }
         string UserName { get; }
-        double Money { get; }
-        void ChangeBalance(double money);
+        decimal Money { get; }
+        void ChangeBalance(decimal money);
     }
 }

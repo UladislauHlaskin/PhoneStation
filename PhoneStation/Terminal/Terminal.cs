@@ -7,7 +7,7 @@ namespace PhoneStation.Terminal
     public class Terminal : ITerminal
     {
         public IPort Port { get; set; }
-        public IPhoneNumber PhoneNumber { get; set; }
+        public IStationUser PhoneNumber { get; set; }
 
         public event TerminalEventHandler TryingToCall;
         public event TerminalEventHandler ReceivingCall;
@@ -17,7 +17,7 @@ namespace PhoneStation.Terminal
 
         private string _someonesNumber;
 
-        public Terminal(IPhoneNumber phoneNumber)
+        public Terminal(IStationUser phoneNumber)
         {
             PhoneNumber = phoneNumber;
         }

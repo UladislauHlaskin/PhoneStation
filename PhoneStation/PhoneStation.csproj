@@ -41,8 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PhoneNumber\IPhoneNumber.cs" />
-    <Compile Include="PhoneNumber\PhoneNumber.cs" />
+    <Compile Include="PhoneNumber\IStationUser.cs" />
+    <Compile Include="PhoneNumber\StationUser.cs" />
     <Compile Include="Port\IPort.cs" />
     <Compile Include="Port\Port.cs" />
     <Compile Include="Port\PortState.cs" />

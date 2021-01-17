@@ -11,10 +11,10 @@ namespace PhoneStation.Station
     {
         public IList<IPort> AvailablePorts { get; private set; }
         public Log Log { get; }
-        public double Tariff { get; private set; }
+        public decimal Tariff { get; private set; }
 
         private int _defaultPortCapacity = 10;
-        private double _defaultTariff = 1;
+        private decimal _defaultTariff = 1;
         private IList<OngoingCall> _ongoingCalls;
 
         public Station()
@@ -29,7 +29,7 @@ namespace PhoneStation.Station
             Tariff = _defaultTariff;
         }
 
-        public Station(int portCapacity, double tariff)
+        public Station(int portCapacity, decimal tariff)
         {
             AvailablePorts = new List<IPort>();
             for (int i = 0; i < portCapacity; i++)
@@ -94,7 +94,7 @@ namespace PhoneStation.Station
             }
         }
 
-        void SpendMoney(IPhoneNumber caller, double moneySpent)
+        void SpendMoney(IStationUser caller, decimal moneySpent)
         {
             caller.ChangeBalance(-moneySpent);
         }

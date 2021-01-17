@@ -38,7 +38,7 @@ namespace Demo
             var anonymousPhone = GetTerminalByName(terminals, "Anonymous");
             var michaelsPhone = GetTerminalByName(terminals, "Michael");
             var rachelsPhone = GetTerminalByName(terminals, "Rachel");
-            var jacksPhone = GetTerminal(new PhoneNumber("000-00-01", "Jack", 0), ConsoleTerminalHandler.OnTryToCallBeep);
+            var jacksPhone = GetTerminal(new StationUser("000-00-01", "Jack", 0), ConsoleTerminalHandler.OnTryToCallBeep);
 
             //// тест #1 - тесты где абенент может быть недоступен или бросил трубку
             //Call(michaelsPhone, johnsPhone);
@@ -79,17 +79,17 @@ namespace Demo
         static IList<ITerminal> GetTerminals()
         {
             List<ITerminal> terminals = new List<ITerminal>();
-            terminals.Add(GetTerminal(new PhoneNumber("123-00-00", "John", 22), ConsoleTerminalHandler.OnTryToCallBeep));
-            terminals.Add(GetTerminal(new PhoneNumber("123-00-01", "Jane", 18), ConsoleTerminalHandler.OnTryToCallCustomSong));
-            terminals.Add(GetTerminal(new PhoneNumber("123-00-03", "Anonymous", 19), ConsoleTerminalHandler.OnTryToCallBeep));
-            terminals.Add(GetTerminal(new PhoneNumber("321-00-01", "Michael", 20), ConsoleTerminalHandler.OnTryToCallBeep));
-            terminals.Add(GetTerminal(new PhoneNumber("431-01-01", "Rachel", 20), ConsoleTerminalHandler.OnTryToCallCustomSong));
+            terminals.Add(GetTerminal(new StationUser("123-00-00", "John", 22), ConsoleTerminalHandler.OnTryToCallBeep));
+            terminals.Add(GetTerminal(new StationUser("123-00-01", "Jane", 18), ConsoleTerminalHandler.OnTryToCallCustomSong));
+            terminals.Add(GetTerminal(new StationUser("123-00-03", "Anonymous", 19), ConsoleTerminalHandler.OnTryToCallBeep));
+            terminals.Add(GetTerminal(new StationUser("321-00-01", "Michael", 20), ConsoleTerminalHandler.OnTryToCallBeep));
+            terminals.Add(GetTerminal(new StationUser("431-01-01", "Rachel", 20), ConsoleTerminalHandler.OnTryToCallCustomSong));
             return terminals;
         }
 
-        static ITerminal GetTerminal(IPhoneNumber phoneNumber, TerminalEventHandler terminalEventHandler)
+        static ITerminal GetTerminal(IStationUser phoneNumber, TerminalEventHandler terminalEventHandler)
         {
-            var terminal = new Terminal(new PhoneNumber(phoneNumber.Number, phoneNumber.UserName, phoneNumber.Money));
+            var terminal = new Terminal(new StationUser(phoneNumber.Number, phoneNumber.UserName, phoneNumber.Money));
             terminal.TryingToCall += terminalEventHandler;
             terminal.ReceivingCall += ConsoleTerminalHandler.OnReceiveCallNotification;
             terminal.Answering += ConsoleTerminalHandler.OnAnswer;

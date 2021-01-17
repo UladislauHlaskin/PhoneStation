@@ -9,7 +9,7 @@ namespace PhoneStation.Station
     {
         IList<IPort> AvailablePorts { get; }
         Log Log { get; }
-        double Tariff { get; }
+        decimal Tariff { get; }
         void SendRequestToCall(string callerNumber, string receiverNumber);
         void StartOnGoingCall(string caller, string receiver);
         void EndOngoingCall(string droppingNumber, int callDurationMinutes);
